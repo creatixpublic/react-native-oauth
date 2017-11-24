@@ -39,12 +39,8 @@ import com.facebook.react.bridge.ReadableMapKeySetIterator;
 public class OAuthManagerProviders {
   private static final String TAG = "OAuthManagerProviders";
 
-  static public OAuth10aService getApiFor10aProvider(
-    final String providerName,
-    final HashMap params,
-    @Nullable final ReadableMap opts,
-    final String callbackUrl
-  ) {
+  static public OAuth10aService getApiFor10aProvider(final String providerName, final HashMap params,
+      @Nullable final ReadableMap opts, final String callbackUrl) {
     if (providerName.equalsIgnoreCase("twitter")) {
       return OAuthManagerProviders.twitterService(params, opts, callbackUrl);
     } else {
@@ -52,12 +48,8 @@ public class OAuthManagerProviders {
     }
   }
 
-  static public OAuth20Service getApiFor20Provider(
-    final String providerName,
-    final HashMap params,
-    @Nullable final ReadableMap opts,
-    final String callbackUrl
-  ) {
+  static public OAuth20Service getApiFor20Provider(final String providerName, final HashMap params,
+      @Nullable final ReadableMap opts, final String callbackUrl) {
     if (providerName.equalsIgnoreCase("facebook")) {
       return OAuthManagerProviders.facebookService(params, opts, callbackUrl);
     }
@@ -81,16 +73,10 @@ public class OAuthManagerProviders {
     return null;
   }
 
-  static public OAuthRequest getRequestForProvider(
-    final String providerName,
-    final Verb httpVerb,
-    final OAuth1AccessToken oa1token,
-    final URL url,
-    final HashMap<String,Object> cfg,
-    @Nullable final ReadableMap params
-  ) {
-    final OAuth10aService service =
-          OAuthManagerProviders.getApiFor10aProvider(providerName, cfg, null, null);
+  static public OAuthRequest getRequestForProvider(final String providerName, final Verb httpVerb,
+      final OAuth1AccessToken oa1token, final URL url, final HashMap<String, Object> cfg,
+      @Nullable final ReadableMap params) {
+    final OAuth10aService service = OAuthManagerProviders.getApiFor10aProvider(providerName, cfg, null, null);
 
     String token = oa1token.getToken();
     OAuthConfig config = service.getConfig();
@@ -101,16 +87,10 @@ public class OAuthManagerProviders {
     return request;
   }
 
-  static public OAuthRequest getRequestForProvider(
-    final String providerName,
-    final Verb httpVerb,
-    final OAuth2AccessToken oa2token,
-    final URL url,
-    final HashMap<String,Object> cfg,
-    @Nullable final ReadableMap params
-  ) {
-    final OAuth20Service service =
-        OAuthManagerProviders.getApiFor20Provider(providerName, cfg, null, null);
+  static public OAuthRequest getRequestForProvider(final String providerName, final Verb httpVerb,
+      final OAuth2AccessToken oa2token, final URL url, final HashMap<String, Object> cfg,
+      @Nullable final ReadableMap params) {
+    final OAuth20Service service = OAuthManagerProviders.getApiFor20Provider(providerName, cfg, null, null);
 
     OAuthConfig config = service.getConfig();
     OAuthRequest request = new OAuthRequest(httpVerb, url.toString(), config);
@@ -129,44 +109,36 @@ public class OAuthManagerProviders {
   }
 
   // Helper to add parameters to the request
-  static private OAuthRequest addParametersToRequest(
-    OAuthRequest request,
-    final String access_token,
-    @Nullable final ReadableMap params
-  ) {
+  static private OAuthRequest addParametersToRequest(OAuthRequest request, final String access_token,
+      @Nullable final ReadableMap params) {
     if (params != null && params.hasKey("params")) {
       ReadableMapKeySetIterator iterator = params.keySetIterator();
       while (iterator.hasNextKey()) {
         String key = iterator.nextKey();
         ReadableType readableType = params.getType(key);
-        switch(readableType) {
-          case String:
-            String val = params.getString(key);
-            // String escapedVal = Uri.encode(val);
-            if (val.equals("access_token")) {
-              val = access_token;
-            }
-            request.addParameter(key, val);
-            break;
-          default:
-            throw new IllegalArgumentException("Could not read object with key: " + key);
+        switch (readableType) {
+        case String:
+          String val = params.getString(key);
+          // String escapedVal = Uri.encode(val);
+          if (val.equals("access_token")) {
+            val = access_token;
+          }
+          request.addParameter(key, val);
+          break;
+        default:
+          throw new IllegalArgumentException("Could not read object with key: " + key);
         }
       }
     }
     return request;
   }
 
-  private static OAuth10aService twitterService(
-    final HashMap cfg,
-    @Nullable final ReadableMap opts,
-    final String callbackUrl) {
+  private static OAuth10aService twitterService(final HashMap cfg, @Nullable final ReadableMap opts,
+      final String callbackUrl) {
     String consumerKey = (String) cfg.get("consumer_key");
     String consumerSecret = (String) cfg.get("consumer_secret");
 
-    ServiceBuilder builder = new ServiceBuilder()
-          .apiKey(consumerKey)
-          .apiSecret(consumerSecret)
-          .debug();
+    ServiceBuilder builder = new ServiceBuilder().apiKey(consumerKey).apiSecret(consumerSecret).debug();
 
     String scopes = (String) cfg.get("scopes");
     if (scopes != null) {
@@ -182,45 +154,33 @@ public class OAuthManagerProviders {
     return builder.build(TwitterApi.instance());
   }
 
-  private static OAuth20Service facebookService(
-    final HashMap cfg,
-    @Nullable final ReadableMap opts,
-    final String callbackUrl) {
+  private static OAuth20Service facebookService(final HashMap cfg, @Nullable final ReadableMap opts,
+      final String callbackUrl) {
     ServiceBuilder builder = OAuthManagerProviders._oauth2ServiceBuilder(cfg, opts, callbackUrl);
     return builder.build(FacebookApi.instance());
   }
 
-  private static OAuth20Service googleService(
-    final HashMap cfg,
-    @Nullable final ReadableMap opts,
-    final String callbackUrl)
-  {
+  private static OAuth20Service googleService(final HashMap cfg, @Nullable final ReadableMap opts,
+      final String callbackUrl) {
     ServiceBuilder builder = OAuthManagerProviders._oauth2ServiceBuilder(cfg, opts, callbackUrl);
     return builder.build(GoogleApi20.instance());
   }
 
-  private static OAuth20Service githubService(
-    final HashMap cfg,
-    @Nullable final ReadableMap opts,
-    final String callbackUrl)
-  {
+  private static OAuth20Service githubService(final HashMap cfg, @Nullable final ReadableMap opts,
+      final String callbackUrl) {
 
     ServiceBuilder builder = OAuthManagerProviders._oauth2ServiceBuilder(cfg, opts, callbackUrl);
     return builder.build(GitHubApi.instance());
   }
 
-  private static OAuth20Service configurableService(
-    final HashMap cfg,
-    @Nullable final ReadableMap opts,
-    final String callbackUrl
-  ) {
+  private static OAuth20Service configurableService(final HashMap cfg, @Nullable final ReadableMap opts,
+      final String callbackUrl) {
     ServiceBuilder builder = OAuthManagerProviders._oauth2ServiceBuilder(cfg, opts, callbackUrl);
     Log.d(TAG, "Creating ConfigurableApi");
     //Log.d(TAG, "    authorize_url:     " + cfg.get("authorize_url"));
     //Log.d(TAG, "    access_token_url:  " + cfg.get("access_token_url"));
-    ConfigurableApi api = ConfigurableApi.instance()
-      .setAccessTokenEndpoint((String) cfg.get("access_token_url"))
-      .setAuthorizationBaseUrl((String) cfg.get("authorize_url"));
+    ConfigurableApi api = ConfigurableApi.instance().setAccessTokenEndpoint((String) cfg.get("access_token_url"))
+        .setAuthorizationBaseUrl((String) cfg.get("authorize_url"));
     if (cfg.containsKey("access_token_verb")) {
       //Log.d(TAG, "    access_token_verb: " + cfg.get("access_token_verb"));
       api.setAccessTokenVerb((String) cfg.get("access_token_verb"));
@@ -229,22 +189,16 @@ public class OAuthManagerProviders {
     return builder.build(api);
   }
 
-  private static OAuth20Service slackService(
-    final HashMap cfg,
-    @Nullable final ReadableMap opts,
-    final String callbackUrl
-    ) {
+  private static OAuth20Service slackService(final HashMap cfg, @Nullable final ReadableMap opts,
+      final String callbackUrl) {
 
     Log.d(TAG, "Make the builder: " + SlackApi.class);
     ServiceBuilder builder = OAuthManagerProviders._oauth2ServiceBuilder(cfg, opts, callbackUrl);
     return builder.build(SlackApi.instance());
   }
 
-  private static ServiceBuilder _oauth2ServiceBuilder(
-    final HashMap cfg,
-    @Nullable final ReadableMap opts,
-    final String callbackUrl
-  ) {
+  private static ServiceBuilder _oauth2ServiceBuilder(final HashMap cfg, @Nullable final ReadableMap opts,
+      final String callbackUrl) {
     String clientKey = (String) cfg.get("client_id");
     String clientSecret = (String) cfg.get("client_secret");
     String state;
@@ -255,32 +209,28 @@ public class OAuthManagerProviders {
     }
 
     // Builder
-    ServiceBuilder builder = new ServiceBuilder()
-      .apiKey(clientKey)
-      .apiSecret(clientSecret)
-      .state(state)
-      .debug();
+    ServiceBuilder builder = new ServiceBuilder().apiKey(clientKey).apiSecret(clientSecret).state(state).debug();
 
     String scopes = "";
     if (cfg.containsKey("scopes")) {
       scopes = (String) cfg.get("scopes");
-      String scopeStr = OAuthManagerProviders.getScopeString(scopes, ",");
+      String scopeStr = OAuthManagerProviders.getScopeString(scopes, " ");
       builder.scope(scopeStr);
     }
 
-    boolean rawScopes = (cfg.containsKey("rawScopes") && ((String)cfg.get("rawScopes")).equalsIgnoreCase("true"));
+    boolean rawScopes = (cfg.containsKey("rawScopes") && ((String) cfg.get("rawScopes")).equalsIgnoreCase("true"));
 
     if (opts != null && opts.hasKey("scopes")) {
       scopes = (String) opts.getString("scopes");
       String scopeStr = null;
-      
+
       if (!rawScopes)
         scopeStr = OAuthManagerProviders.getScopeString(scopes, ",");
       else
         scopeStr = scopes;
-        
+
       builder.scope(scopeStr);
-    } 
+    }
 
     if (callbackUrl != null) {
       builder.callback(callbackUrl);
@@ -292,11 +242,8 @@ public class OAuthManagerProviders {
   /**
    * Convert a list of scopes by space or string into an array
    */
-  private static String getScopeString(
-    final String scopes,
-    final String joinBy
-  ) {
-    List<String> array = Arrays.asList(scopes.replaceAll("\\s", "").split("[ ,]+"));
+  private static String getScopeString(final String scopes, final String joinBy) {
+    List<String> array = Arrays.asList(scopes.replaceAll("\\s", "").split(","));
     Log.d(TAG, "array: " + array + " (" + array.size() + ") from " + scopes);
     return TextUtils.join(joinBy, array);
   }
